@@ -1,10 +1,10 @@
-<div class="flex flex-col min-h-screen">
-
+<div class="flex flex-col min-h-screen w-[60vw] mx-auto">
+    
     <!-- Main weather card -->
     <div class="relative mx-6 md:mx-15 mt-10 h-[50vh] shadow-2xl rounded-3xl overflow-hidden">
 
         <img
-            [src]="temperature <= 15 ? './coldweather.jpg' : './hotweather.jpg'"
+            [src]="weatherData.current.temperature_2m <= 15 ? './coldweather.jpg' : './hotweather.jpg'"
             alt="Weather"
             class="absolute inset-0 w-full h-full object-cover"
         >
@@ -15,7 +15,7 @@
             </h5>
 
             <h3 class="text-7xl md:text-8xl">
-                {{temperature}} °C
+                {{weatherData.current.temperature_2m}} °C
             </h3>
         </div>
 
@@ -33,7 +33,7 @@
 
 
             <!-- Information grid -->
-            <div class="grid grid-cols-2 gap-10 w-screen mx-15 my-15">
+            <div class="grid grid-cols-2 gap-10 w-full mx-15 my-15">
 
                 <!-- Min -->
                 <div class="flex items-center gap-4">
@@ -48,7 +48,7 @@
                     </div>
 
                     <h6 class="text-2xl md:text-3xl">
-                        {{minTemperature}}°
+                        {{weatherData.daily.temperature_2m_min[0]}}°
                     </h6>
 
                 </div>
@@ -67,7 +67,7 @@
                     </div>
 
                     <h6 class="text-2xl md:text-3xl">
-                        {{maxTemperature}}°
+                        {{weatherData.daily.temperature_2m_max[0] }}°
                     </h6>
 
                 </div>
@@ -86,7 +86,7 @@
                     </div>
 
                     <h6 class="text-2xl md:text-3xl">
-                        {{moisture}} %
+                        {{weatherData.current.relative_humidity_2m}} %
                     </h6>
 
                 </div>
@@ -105,7 +105,7 @@
                     </div>
 
                     <h6 class="text-2xl md:text-3xl">
-                        {{windSpeed}} km/h
+                        {{weatherData.current.wind_speed_10m}} km/h
                     </h6>
 
                 </div>

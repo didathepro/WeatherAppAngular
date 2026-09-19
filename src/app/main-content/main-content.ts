@@ -1,16 +1,25 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import { WeatherApp } from '../services/weather-app';
+import { WeatherData } from '../services/weather-data';
+import { FormsModule } from '@angular/forms';
 
 @Component({
-  imports: [],
+  imports: [FormsModule],
   selector: 'app-main-content',
   styleUrl: './main-content.css',
   templateUrl: './main-content.html',
 })
-export class MainContent {
-  temperature:number = 15;
-  minTemperature:number = 9;
-  maxTemperature:number = 29;
-  city:string = "Graz";
-  moisture:number = 85;
-  windSpeed: number = 11.83;
+export class MainContent implements OnInit {
+
+  private weatherService = inject(WeatherApp);
+
+  weatherData!: WeatherData;
+  city: string = 'Graz';
+
+  ngOnInit() {
+    this.weatherService.getWeather().subscribe(data => {
+      this.weatherData = data;
+      console.log(data);
+    });
+  }
 }
