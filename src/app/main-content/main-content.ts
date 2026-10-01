@@ -1,25 +1,41 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { WeatherApp } from '../services/weather-app';
 import { WeatherData } from '../services/weather-data';
-import { FormsModule } from '@angular/forms';
 
 @Component({
-  imports: [FormsModule],
   selector: 'app-main-content',
   styleUrl: './main-content.css',
   templateUrl: './main-content.html',
 })
 export class MainContent implements OnInit {
-
   private weatherService = inject(WeatherApp);
 
-  weatherData!: WeatherData;
-  city: string = 'Graz';
+  weatherData = signal<WeatherData | null>(null);
+  city = signal('');
+  loading = signal(false);
+  error = signal('');
 
   ngOnInit() {
-    this.weatherService.getWeather().subscribe(data => {
-      this.weatherData = data;
-      console.log(data);
+    this.search('Graz');
+  }
+
+  search(name: string) {
+    name = name.trim();
+    if (!name) return;
+
+    this.loading.set(true);
+    this.error.set('');
+
+    this.weatherService.getWeatherByCity(name).subscribe({
+      next: ({ cityName, weather }) => {
+        this.city.set(cityName);
+        this.weatherData.set(weather);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.error.set('Grad nije pronađen.');
+        this.loading.set(false);
+      },
     });
   }
 }

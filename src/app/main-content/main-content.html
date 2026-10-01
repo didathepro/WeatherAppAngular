@@ -1,21 +1,48 @@
-<div class="flex flex-col min-h-screen w-[60vw] mx-auto">
+<div class="w-[50vw] mx-auto mt-10 px-6 flex gap-3">
+  <input
+    #cityInput
+    type="text"
+    [disabled]="loading()"
+    placeholder="Search city..."
+    class="flex-1 rounded-xl border border-gray-300 px-4 py-2 shadow text-white"
+    (keyup.enter)="search(cityInput.value);cityInput.value = ''"
+  >
+  <button
+    class="rounded-xl bg-[#5e64b5] px-6 py-2 text-white shadow cursor-pointer"
+    (click)="search(cityInput.value);cityInput.value = ''"
+  >
+  @if (loading()) {
+    <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+    Searching...
+  } @else {
+    Search
+  }
+  </button>
+</div>
+
+@if (error()) {
+  <p class="w-[60vw] mx-auto mt-3 px-6 text-red-600">{{ error() }}</p>
+}
+
+@if(weatherData(); as w) { 
+    <div class="flex flex-col min-h-screen w-[60vw] mx-auto transition-opacity" [class.opacity-50]="loading()">
     
     <!-- Main weather card -->
     <div class="relative mx-6 md:mx-15 mt-10 h-[50vh] shadow-2xl rounded-3xl overflow-hidden">
 
         <img
-            [src]="weatherData.current.temperature_2m <= 15 ? './coldweather.jpg' : './hotweather.jpg'"
+            [src]="w.current.temperature_2m <= 15 ? './coldweather.jpg' : './hotweather.jpg'"
             alt="Weather"
             class="absolute inset-0 w-full h-full object-cover"
         >
 
         <div class="relative z-10 h-full flex flex-col items-center justify-center text-white">
             <h5 class="text-4xl pb-5">
-                {{city}}
+                {{city()}}
             </h5>
 
             <h3 class="text-7xl md:text-8xl">
-                {{weatherData.current.temperature_2m}} °C
+                {{w.current.temperature_2m}} °C
             </h3>
         </div>
 
@@ -48,7 +75,7 @@
                     </div>
 
                     <h6 class="text-2xl md:text-3xl">
-                        {{weatherData.daily.temperature_2m_min[0]}}°
+                        {{w.daily.temperature_2m_min[0]}}°
                     </h6>
 
                 </div>
@@ -67,7 +94,7 @@
                     </div>
 
                     <h6 class="text-2xl md:text-3xl">
-                        {{weatherData.daily.temperature_2m_max[0] }}°
+                        {{w.daily.temperature_2m_max[0] }}°
                     </h6>
 
                 </div>
@@ -86,7 +113,7 @@
                     </div>
 
                     <h6 class="text-2xl md:text-3xl">
-                        {{weatherData.current.relative_humidity_2m}} %
+                        {{w.current.relative_humidity_2m}} %
                     </h6>
 
                 </div>
@@ -105,7 +132,7 @@
                     </div>
 
                     <h6 class="text-2xl md:text-3xl">
-                        {{weatherData.current.wind_speed_10m}} km/h
+                        {{w.current.wind_speed_10m}} km/h
                     </h6>
 
                 </div>
@@ -117,4 +144,10 @@
     </div>
 
 </div>
-```
+
+}
+ @else {
+    <div class="flex items-center justify-center min-h-screen">
+        <p class="text-2xl">Loading weather...</p>
+    </div>
+}

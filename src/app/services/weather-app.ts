@@ -1,18 +1,43 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { WeatherData } from '../services/weather-data'
+import { map, switchMap, throwError } from 'rxjs';
+import { WeatherData } from '../services/weather-data';
 
-@Injectable({
-  providedIn: 'root'
-})
+interface GeocodingResponse {
+  results?: { name: string; latitude: number; longitude: number; country: string }[];
+}
+
+@Injectable({ providedIn: 'root' })
 export class WeatherApp {
-
   private http = inject(HttpClient);
 
-  private apiUrl =
-    'https://api.open-meteo.com/v1/forecast?latitude=47.0707&longitude=15.4395&current=temperature_2m,relative_humidity_2m,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&timezone=auto';
+  private geoUrl = 'https://geocoding-api.open-meteo.com/v1/search';
+  private weatherUrl = 'https://api.open-meteo.com/v1/forecast';
 
-  getWeather() {
-    return this.http.get<WeatherData>(this.apiUrl);
+  getWeather(lat: number, lon: number) {
+    return this.http.get<WeatherData>(this.weatherUrl, {
+      params: {
+        latitude: lat,
+        longitude: lon,
+        current: 'temperature_2m,relative_humidity_2m,wind_speed_10m',
+        daily: 'temperature_2m_max,temperature_2m_min',
+        timezone: 'auto',
+      },
+    });
+  }
+
+  getWeatherByCity(name: string) {
+    return this.http
+      .get<GeocodingResponse>(this.geoUrl, { params: { name, count: 1 } })
+      .pipe(
+        switchMap(res => {
+          const place = res.results?.[0];
+          if (!place) return throwError(() => new Error('City not found'));
+
+          return this.getWeather(place.latitude, place.longitude).pipe(
+            map(weather => ({ cityName: place.name, weather }))
+          );
+        })
+      );
   }
 }
